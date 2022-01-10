@@ -25,15 +25,17 @@ signals:
 
 public slots:
     void onTextChanged();
-    void onArrayDisplaysChanged();
+    void onNumberChanged();
+    void onArrayChanged();
     void onStateChanged(int state);
 
 
 private:
     QJsonValueRef m_ref;
     QString m_key;
-    Ui::UIObject *ui;
     QWidget *m_widget;
+
+    Ui::UIObject *ui;
 };
 
 

@@ -8,6 +8,7 @@
 #include <utility>
 #include <QJsonArray>
 #include <QCheckBox>
+#include <QRegExpValidator>
 #include "UIObject.hpp"
 #include "ui_UIObject.h"
 #include "UIArray.hpp"
@@ -27,6 +28,16 @@ UIObject::UIObject(QWidget *parent, QJsonValueRef ref, QString key) :
         connect(widget,&QLineEdit::textChanged, this, &UIObject::onTextChanged);
 
         m_widget = widget;
+    } else if (m_ref.isDouble()) {
+        auto *widget = new QLineEdit();
+        widget->setValidator(new QRegExpValidator(QRegExp("[0-9]*"), widget));
+        double value = m_ref.toDouble();
+        widget->setText(QString::number(value));
+        ui->verticalLayout_Value->addWidget(widget);
+
+        connect(widget,&QLineEdit::textChanged, this, &UIObject::onNumberChanged);
+
+        m_widget = widget;
     } else if (m_ref.isBool()) {
         auto *widget = new QCheckBox();
         widget->setText("");
@@ -39,7 +50,7 @@ UIObject::UIObject(QWidget *parent, QJsonValueRef ref, QString key) :
     } else if (m_ref.isArray()) {
         auto *widget = new UIArray(nullptr, m_ref);
         ui->verticalLayout_Value->addWidget(widget);
-        connect(widget,&UIArray::changed, this, &UIObject::onArrayDisplaysChanged);
+        connect(widget,&UIArray::changed, this, &UIObject::onArrayChanged);
         m_widget = widget;
     }
 
@@ -60,7 +71,17 @@ void UIObject::onTextChanged() {
 
 }
 
-void UIObject::onArrayDisplaysChanged() {
+void UIObject::onNumberChanged() {
+    qDebug()  << "UIObject::onNumberChanged()";
+    auto *widget = (QLineEdit *)m_widget;
+    double number =widget->text().toDouble();
+    m_ref = number;
+    qDebug() << "m_ref:" << m_ref;
+    emit changed();
+
+}
+
+void UIObject::onArrayChanged() {
     qDebug()  << "UIObject::onArrayDisplaysChanged()";
     emit changed();
 }
