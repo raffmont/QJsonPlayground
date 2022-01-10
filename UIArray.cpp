@@ -25,6 +25,7 @@ UIArray::UIArray(QWidget *parent, QJsonValueRef mRef) :
             connect(uiItem,&UIItem::changed, this, &UIArray::onChanged);
         }
     }
+    connect(ui->pushButton_Add,&QPushButton::clicked,this,&UIArray::onAdd);
 }
 
 UIArray::~UIArray() {
@@ -37,6 +38,26 @@ UIArray::~UIArray() {
 void UIArray::onChanged() {
     qDebug() << "UIArray::onChanged()";
     m_ref = m_jsonArray;
+    emit changed();
+}
+
+void UIArray::onAdd() {
+    qDebug() << "UIArray::onAdd()";
+    QJsonObject jsonObject;
+    jsonObject["class"] = "it::uniparthenope::fairwind::MyClass";
+    jsonObject["active"] = false;
+    m_jsonArray.append(jsonObject);
+
+    QJsonValueRef ref = m_jsonArray[m_jsonArray.size()-1];
+    auto *uiItem = new UIItem(nullptr,ref);
+    ui->verticalLayout_Container->addWidget(uiItem);
+    m_uiItems.append(uiItem);
+
+    connect(uiItem,&UIItem::changed, this, &UIArray::onChanged);
+
+
+    m_ref = m_jsonArray;
+    emit changed();
 }
 
 

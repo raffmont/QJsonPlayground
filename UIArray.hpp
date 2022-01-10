@@ -27,6 +27,7 @@ public:
 
 public slots:
     void onChanged();
+    void onAdd();
 
 private:
     Ui::UIArray *ui;
